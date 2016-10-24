@@ -36,12 +36,19 @@ SCREEN_HEIGHT = 600
 
 class Player(pygame.sprite.Sprite):
 	# This class represents the bar at the bottom that the player controls. #
+	# Set speed vector of player
+	change_x = 0
+	change_y = 0
+
+	# List of sprites we can bump against
+	level = None
 
 	# -- Methods
 	def __init__(self):
 	# Constructor function #
 		# Call the parent's constructor
-		super().__init__()
+		pygame.sprite.Sprite.__init__(self)
+		#super().__init__()
 
 		# Create an image of the block, and fill it with a color.
 		# This could also be an image loaded from the disk.
@@ -53,12 +60,12 @@ class Player(pygame.sprite.Sprite):
 		# Set a referance to the image rect.
 		self.rect = self.image.get_rect()
 
-		# Set speed vector of player
+		'''# Set speed vector of player
 		self.change_x = 0
 		self.change_y = 0
 
 		# List of sprites we can bump against
-		self.level = None
+		self.level = None'''
 
 	def update(self):
 		# Move the player. #
@@ -136,7 +143,7 @@ class Platform(pygame.sprite.Sprite): ## Platform the user can jump on #
 	## Platform constructor. Assumes constructed with user passing in
 	#an array of 5 numbers like what's defined at the top of this
 	#code. #
-		super().__init__()
+		pygame.sprite.Sprite.__init__(self)
 
 		self.image = pygame.Surface([width, height])
 		self.image.fill(GREEN)
@@ -148,6 +155,10 @@ class Level(object):
 	# This is a generic super-class used to define a level.
 	# Create a child class for each level with level-specific
 	# info.
+	platform_list = None
+	enemy_list = None
+	background = None
+
 
 	def __init__(self, player):
 	## Constructor. Pass in a handle to player. Needed for when moving platforms
@@ -187,18 +198,15 @@ class Level_01(Level):
 		Level.__init__(self, player)
 
 		# Array with width, height, x, and y of platform
-		level = [[210, 70, 500, 500],
-		 [210, 70, 200, 400],
-		 [210, 70, 600, 300],
- 		]
+		level = [[210, 70, 500, 500],[210, 70, 200, 400],[210, 70, 600, 300],]	
 
 	# Go through the array above and add platforms
-	for platform in level:
-		block = Platform(platform[0], platform[1])
-		block.rect.x = platform[2]
-		block.rect.y = platform[3]
-		block.player = self.player
-		self.platform_list.add(block)
+		for platform in level:
+			block = Platform(platform[0], platform[1])
+			block.rect.x = platform[2]
+			block.rect.y = platform[3]
+			block.player = self.player
+			self.platform_list.add(block)
 
 
 def main():
