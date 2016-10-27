@@ -6,21 +6,29 @@ pygame.init()
 black= (0,0,0) #initializes the color black
 size = width, height = 500,500 #size of the screen
 screen = pygame.display.set_mode(size) #initializes the screen size
+floor= 0 #x-coordinate of the floor
 
 class Avatar(pygame.sprite.Sprite):
 	def __init__(self, image):
 		self.image=pygame.image.load(image) #image of skeevy
 		self.x=0 #these coordinates don't work, but the ideal starting point is the bottom left corner
-		self.y=height 
+		self.y=floor
+		self.dx=0
+		self.dy=0
 
 	def move_left(self): #skeevy moves left
-		pass
+		self.dx=-5
+		self.x=self.x+self.dx
 
 	def move_right(self): #skeevy moves right
-		pass
+		self.dx=5
+		self.x=self.x+self.dx
 
-	def jump(self): #skeevy jumps (following the laws of physics)
-		pass
+	def jump(self): #skeevy jumps (following the laws of physics (but changing the gravitational constant to make it easier to jump)))
+		self.dy=10
+		while(self.x>=floor): #when we figure out how collisions work, we need to implement that too
+			self.y+=self.dy
+			self.dy+=-1
 
 class AvatarViewer(Avatar): #the viewer updates the screen to new coordinates
 	def __init__(self, model):
@@ -38,7 +46,7 @@ class Controller(object):
 	def handle_event(self, event):
 		if event.type==pygame.KEYUP(): #jump! :D
 			pass
-		if event.type==pygame.KEYDOWN(): #
+		if event.type==pygame.KEYDOWN(): #need to figure out how these pygame commands work
 			pass
 
 
