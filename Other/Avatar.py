@@ -16,23 +16,27 @@ class Avatar(pygame.sprite.Sprite):
 		self.dx=0
 		self.dy=0
 
+	def step(self): #steps skeevy using acceleration
+		self.x=self.x+self.dx
+		self.y=self.y=self.dy
+		SkeevyView.drawAvatar(screen)
 
 	def move_left(self): #skeevy moves left
 		self.dx=-5
-		self.x=self.x+self.dx
-		SkeevyView.drawAvatar(self,screen)
+		self.step()
+		self.dx=0
 
 	def move_right(self): #skeevy moves right
 		self.dx=5
-		self.x=self.x+self.dx
-		SkeevyView.drawAvatar(self,screen)
+		self.step()
+		self.dx=0
 
 	def jump(self): #skeevy jumps (following the laws of physics (but changing the gravitational constant to make it easier to jump)))
 		self.dy=10
 		while(self.x>=floor): #when we figure out how collisions work, we need to implement that too
-			self.y+=self.dy
-			self.dy+=-1
-			SkeevyView.drawAvatar(self,screen)
+			self.dy=-1
+			self.step()
+		self.dy=0
 
 
 class AvatarViewer(Avatar): #the viewer updates the screen to new coordinates
@@ -51,16 +55,16 @@ class Controller(object):
 	def handle_event(self, event):
 		print event
 		if event.type==pygame.MOUSEBUTTONDOWN: #jump! :D
-			pass
+			self.models[0].move_right() #specific to Skeevy being the first model
 		if event.type==pygame.KEYDOWN: #need to figure out how these pygame commands work
 			pass
 
+Skeevy=Avatar('skeevy.jpg') #initializes Skeevy
+SkeevyView=AvatarViewer(Skeevy) #initializing the Avatar Viewer
+models= [Skeevy]
+controller=Controller(models)
 
 def main():
-	Skeevy=Avatar('skeevy.jpg') #initializes Skeevy
-	SkeevyView=AvatarViewer(Skeevy) #initializing the Avatar Viewer
-	models= [Skeevy]
-	controller=Controller(models)
 	while 1: #keeps the screen on 
 		for event in pygame.event.get(): #processing list of events that occur
 			if event.type == pygame.QUIT: 
