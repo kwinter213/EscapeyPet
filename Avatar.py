@@ -51,7 +51,7 @@ class Controller(object):
 
 
 def main():
-	controller=Controller()
+	controller=Controller('somename')
 	while 1: #keeps the screen on 
 		for event in pygame.event.get(): #processing list of events that occur
 			if event.type == pygame.QUIT: 
