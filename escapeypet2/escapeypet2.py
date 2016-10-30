@@ -1,10 +1,12 @@
 ''' Escapey Pet Part 2 12pm 10/30
-Based off Super Mario Bros '''
+Based off Super Mario Bros platformer game
+Some sections adapted from justinmeister, shongsdu,
+stackoverflow forums, platform scroller tutorial '''
 
 import pygame, sys, pyganim
 from pygame.locals import *
 import os
-from spritesheet_functions import SpriteSheet
+from spritesheet_functions import SpriteSheet #justinmeister
 
 # set up pygame
 pygame.init()
@@ -17,22 +19,22 @@ windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 pygame.display.set_caption('Escapey Pet!')
 
 # set up the colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-SKYBLUE = (100, 171, 255)
-MARIOFONT = pygame.font.Font('mario.ttf', 18)
+'''WHITE = (255, 255, 255)
+BLACK = (0, 0, 0) '''
+SKYBLUE = (100, 171, 255) #REPLACING WIth BKGD IMAGE
+MARIOFONT = pygame.font.Font('mario.ttf', 18) #We could use this but maybe fancier?
 
-# variables
+# variables (Experiment with them. Still slow)
 global platforms
 global enemies
 x = 100
 y = 384
 velocityX = 0
 velocityY = 0
-maxVelocityLeft = -3 #max velocity while walking
-maxVelocityRight = 4
-maxVelocityLR = -7 #max velocity while running
-maxVelocityRR = 8
+maxVelocityLeft = -5 #max velocity while walking
+maxVelocityRight = 6
+maxVelocityLR = -8 #max velocity while running
+maxVelocityRR = 9
 maxVelocityFall = 6
 accX = 0
 accY = 0
@@ -62,71 +64,63 @@ livesScreen = False
 livesScreenTime = 0
 gameOver = False
 
-#text and menu image
-marioText = MARIOFONT.render('SKEEVY            ESCAPEY PET', True, WHITE) #'MARIO  WORLD   TIME', True, WHITE
+#text and menu image -- Make own or find diff font?
+hText = MARIOFONT.render('SKEEVY            ESCAPEY PET', True, WHITE)
 levelText = MARIOFONT.render('Level 01', True, WHITE)
-menuImg = pygame.image.load("menu.jpg")
+menuImg = pygame.image.load("menu.jpg") #Need our own menu!
 bkground = pygame.image.load("background_2.png")
 menuImg = pygame.transform.scale(menuImg, (640, 480))
 
-#Create sprite animations and hitbox for mario
+#Create sprite animations and hitbox
 player = pygame.Rect(x, y, 26, 32)
 
-#pygame.sprite.Sprite.__init__(self)
-
-sprite_sheet = SpriteSheet("skeevy2.png")
-# Load all the right facing images into a list
+sprite_sheet = SpriteSheet("skeevy2.png") #function from justinmeister
 skeevy1 = sprite_sheet.get_image(0, 0, 23, 32)
-#self.walking_frames_r.append(image)
 skeevy2 = sprite_sheet.get_image(84, 0, 26, 27)
-#self.walking_frames_r.append(image)
 skeevy3 = sprite_sheet.get_image(127, 0, 25, 27)
-#self.walking_frames_r.append(image)
 skeevy4 = sprite_sheet.get_image(169, 0, 26, 28)
-#self.walking_frames_r.append(image)
 skeevy5 = sprite_sheet.get_image(126, 43, 27, 26)
-#self.walking_frames_r.append(image)
 skeevy6 = sprite_sheet.get_image(125, 86, 29, 25)
-#self.walking_frames_r.append(image)
 skeevy7 = sprite_sheet.get_image(210, 166, 29, 34)
-#self.walking_frames_r.append(image)
 
-marioWalk = pyganim.PygAnimation([(skeevy1, 0.1), (skeevy2, 0.1),
+hWalk = pyganim.PygAnimation([(skeevy1, 0.1), (skeevy2, 0.1),
                                 (skeevy3, 0.1), (skeevy4,0.1)])
 
-scoreCoin = pyganim.PygAnimation([('scoreCoin1.png', 0.5),
+scoreCoin = pyganim.PygAnimation([('scoreCoin1.png', 0.5), #replace with Cheese
                                   ('scoreCoin2.png', 0.13),
                                   ('scoreCoin3.png', 0.13)])
+
 pyganim.PygAnimation.scale(scoreCoin, (10, 18))
 scoreCoin.play()
 
-marioWalk1 = sprite_sheet.get_image(126, 43, 27, 26) #pygame.image.load('mario1.png')
-marioJump = sprite_sheet.get_image(125, 86, 29, 25) #pygame.image.load('marioJUMP.png')
-marioDead = sprite_sheet.get_image(210, 166, 29, 34) #pygame.image.load('marioDEAD.png')
-marioJ = pygame.transform.scale(marioJump, (28, 32))
-marioS = pygame.transform.scale(marioWalk1, (28, 32))
-marioD = pygame.transform.scale(marioDead, (30, 28))
-marioF = pygame.transform.flip(marioS, 1, 0)
-marioJL = pygame.transform.flip(marioJ, 1, 0)
-pyganim.PygAnimation.scale(marioWalk, (28, 32))
-marioWalk.play()
+hWalk1 = sprite_sheet.get_image(126, 43, 27, 26)
+hJump = sprite_sheet.get_image(125, 86, 29, 25)
+hDead = sprite_sheet.get_image(210, 166, 29, 34)
+hJ = pygame.transform.scale(hJump, (28, 32))
+hS = pygame.transform.scale(hWalk1, (28, 32))
+hD = pygame.transform.scale(hDead, (30, 28))
+hF = pygame.transform.flip(hS, 1, 0)
+hJL = pygame.transform.flip(hJ, 1, 0)
+pyganim.PygAnimation.scale(hWalk, (28, 32))
+hWalk.play()
 
 
 #camera stuff
 camera = pygame.Rect(0, 0, 640, 480)
 
-#setup sound
+#setup sound -- Different sounds
 jumpSound = pygame. mixer.Sound('jump.ogg')
 bump = pygame.mixer.Sound('bump.ogg')
 coin = pygame.mixer.Sound('coin.ogg')
 stomp = pygame.mixer.Sound('stomp.wav')
-marioDie = pygame.mixer.Sound('mariodie.wav')
+hDie = pygame.mixer.Sound('mariodie.wav')
 speedUp = pygame.mixer.Sound('fastTheme.ogg')
 gameOverSound = pygame.mixer.Sound('gameover.wav')
 pygame.mixer.music.load('pinacolada.mp3') ##MAIN MUSIC THEME - change below too
 musicPlaying = True
 
-# tiles mario can walk on and hit
+# tiles  can walk on and hit
+#replace platform icons
 class Platform():
 
     def __init__(self, x, y, pic, scaleX, scaleY, fallThrough, animated):
@@ -166,39 +160,108 @@ class Platform():
         windowSurface.blit(self.hitImage, (self.x-cameraX, self.y-cameraY))
         self.hit = True
 
-'''class PowerUp():
-    def __init__(self, x, y, pic, scaleX, scaleY, deadX, deadY, frames, aniSpeed):
-        self.pic = pic
-        self.image1 = [('%s%s.png' % (pic, str(num)), aniSpeed) for num in range(frames)]
-        self.image = pyganim.PygAnimation(self.image1)
-        pyganim.PygAnimation.scale(self.image, (scaleX, scaleY))
-        self.image.play()
-        self.imageD = pygame.image.load('%sDEAD.png' % (pic))
-        self.imageDEAD = pygame.transform.scale(self.imageD, (deadX, deadY))
-        self.x = x
-        self.y = y
-        self.scaleX = scaleX
-        self.scaleY = scaleY
-        self.dead = False
-        self.onGround = True
-        self.enemyMove = -1
-        self.collide = 0
-        self.remove = False
-        self.current = False
-        self.shellMove = False
+#CREATING BIG CHEESE/FINISH LINE
 
-    def rect(self, cameraX, cameraY):
-        return pygame.Rect(self.x-cameraX, self.y-cameraY, self.scaleX, self.scaleY)
 
-    def update(self, cameraX, cameraY):
-        if not self.dead:
-            self.image.blit(windowSurface, (self.x-cameraX, self.y-cameraY))
+#CREATING POWER UPS
+class Powerup(pygame.sprite.Sprite): #adapted from justinarmstrong
+    """Base class for all powerup_group"""
+    def __init__(self, x, y):
+        super(Powerup, self).__init__()
+
+    def setup_powerup(self, x, y, name, setup_frames):
+        """This separate setup function allows me to pass a different
+        setup_frames method depending on what the powerup is"""
+        self.sprite_sheet = setup.GFX['foodicons.png']
+        self.frames = []
+        self.frame_index = 0
+        setup_frames()
+        self.image = self.frames[self.frame_index]
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.y = y
+        self.state = c.REVEAL
+        self.y_vel = -1
+        self.x_vel = 0
+        self.direction = c.RIGHT
+        self.box_height = y
+        self.gravity = 1
+        self.max_y_vel = 8
+        self.animate_timer = 0
+        self.name = name
+
+    def get_image(self, x, y, width, height):
+        """Get the image frames from the sprite sheet"""
+        image = pg.Surface([width, height]).convert()
+        rect = image.get_rect()
+
+        image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
+        image.set_colorkey(c.BLACK)
+
+        image = pg.transform.scale(image,
+                                   (int(rect.width*c.SIZE_MULTIPLIER),                                    int(rect.height*c.SIZE_MULTIPLIER)))
+        return image
+
+    def update(self, game_info, *args):
+        """Updates powerup behavior"""
+        self.current_time = game_info[c.CURRENT_TIME]
+        self.handle_state()
+
+    def handle_state(self):
+        pass
+
+    def revealing(self, *args):
+        """Action when powerup leaves the coin box or brick"""
+        self.rect.y += self.y_vel
+
+        if self.rect.bottom <= self.box_height:
+            self.rect.bottom = self.box_height
+            self.y_vel = 0
+            self.state = c.SLIDE
+
+    def sliding(self):
+        """Action for when powerup slides along the ground"""
+        if self.direction == c.RIGHT:
+            self.x_vel = 3
         else:
-            windowSurface.blit(self.imageDEAD, (self.x-cameraX, self.y-cameraY+16))` '''
+            self.x_vel = -3
 
+    def falling(self):
+        """When powerups fall of a ledge"""
+        if self.y_vel < self.max_y_vel:
+            self.y_vel += self.gravity
+
+class Mushroom(Powerup):
+    """Powerup that makes bigger"""
+    def __init__(self, x, y, name='mushroom'):
+        super(Mushroom, self).__init__(x, y)
+        self.setup_powerup(x, y, name, self.setup_frames)
+
+
+    def setup_frames(self):
+        """Sets up frame list"""
+        self.frames.append(self.get_image(0, 0, 16, 16))
+
+
+    def handle_state(self):
+        """Handles behavior based on state"""
+        if self.state == c.REVEAL:
+            self.revealing()
+        elif self.state == c.SLIDE:
+            self.sliding()
+        elif self.state == c.FALL:
+            self.falling()
+
+class LifeMushroom(Mushroom):
+    """1up mushroom"""
+    def __init__(self, x, y, name='1up_mushroom'):
+        super(LifeMushroom, self).__init__(x, y)
+        self.setup_powerup(x, y, name, self.setup_frames)
+
+    def setup_frames(self):
+        self.frames.append(self.get_image(16, 0, 16, 16))
 
 class Enemy():
-
     def __init__(self, x, y, pic, scaleX, scaleY, deadX, deadY, frames, aniSpeed):
         self.pic = pic
         self.image1 = [('%s%s.png' % (pic, str(num)), aniSpeed) for num in range(frames)]
@@ -310,10 +373,8 @@ class Background(pygame.sprite.Sprite):
 # main game loop
 while True:
     BackGround = Background('background_2.png', [0,0])
-    windowSurface.fill([255, 255, 255]) #REALLY REALLY SLOW
-    windowSurface.blit(BackGround.image, BackGround.rect)
 
-    # spawn mario in level 1
+    # spawn  in level 1
     if livesScreen and pygame.time.get_ticks() - livesScreenTime >= 4000 and not menu:
         if not gameOver:
             livesScreen = False
@@ -327,7 +388,7 @@ while True:
             pygame.mixer.music.load('pinacolada.mp3') #MAIN THEME -- above too
             pygame.mixer.music.play(-1, 0.0)
             if flip:
-                marioWalk.flip(1, 0)
+                hWalk.flip(1, 0)
             buildLevel(level)
         else:
             menu = True
@@ -336,8 +397,10 @@ while True:
             coins = 0
             score = 0
 
-    # check for mario colliding with platforms
+    # check for colliding with platforms
     if not menu:
+        windowSurface.fill([255, 255, 255]) #REALLY REALLY SLOW
+        windowSurface.blit(BackGround.image, BackGround.rect)
 
         collideTop = 0
         collideLeft = 0
@@ -366,7 +429,7 @@ while True:
                             player.right = platform.rect(camera.x, camera.y).left - 5
                             collideRight += 1
 
-        # check for mario colliding with enemies
+        # check for colliding with enemies
         for enemy in enemies:
             enemy.collide = 0
             enemy.current = True
@@ -429,12 +492,12 @@ while True:
                             velocityY = -50
                             velocityX = 0
                             lives -= 1
-                            marioDie.play()
+                            hDie.play()
                             pygame.mixer.music.stop()
                             deadTime = pygame.time.get_ticks()
             enemy.current = False
 
-    #keep track of when mario is in the air
+    #keep track of when is in the air
     if collideTop > 0:
         onGround = True
     else:
@@ -470,7 +533,7 @@ while True:
                     moveLeft = True
                     moveRight = False
                     flip = True
-                    marioWalk.flip(1, 0)
+                    hWalk.flip(1, 0)
                 elif event.key == K_RIGHT:
                     moveRight = True
                     moveLeft = False
@@ -482,11 +545,11 @@ while True:
                     running = False
                 if event.key == K_LEFT:
                     moveLeft = False
-                    marioWalk.flip(1, 0)
+                    hWalk.flip(1, 0)
                 elif event.key == K_RIGHT:
                     moveRight = False
 
-    # movement of mario
+    # player movement
     if jump:
         velocityY = -17
         jump = False
@@ -532,7 +595,7 @@ while True:
     if player.x > 299:
         camera.x += velocityX
 
-    # if mario falls off the level, kill him
+    # falls off the level, die
     if player.y > 480 and not dead:
         dead = True
         onGround = False
@@ -542,7 +605,7 @@ while True:
         jump = False
         velocityX = 0
         lives -= 1
-        marioDie.play()
+        hDie.play()
         pygame.mixer.music.stop()
         deadTime = pygame.time.get_ticks()
 
@@ -550,22 +613,22 @@ while True:
     if not dead:
         if not onGround:
             if not flip:
-                windowSurface.blit(marioJ, player)
+                windowSurface.blit(hJ, player)
             else:
-                windowSurface.blit(marioJL, player)
+                windowSurface.blit(hJL, player)
         elif moveLeft:
             if not jump:
-                marioWalk.blit(windowSurface, player)
+                hWalk.blit(windowSurface, player)
         elif moveRight:
             if not jump:
-                marioWalk.blit(windowSurface, player)
+                hWalk.blit(windowSurface, player)
         elif not moveLeft and not moveRight and onGround:
             if not flip:
-                windowSurface.blit(marioS, player)
+                windowSurface.blit(hS, player)
             else:
-                windowSurface.blit(marioF, player)
+                windowSurface.blit(hF, player)
     else:
-        windowSurface.blit(marioD, player)
+        windowSurface.blit(hD, player)
 
     # show lives screen between menu and level and after deaths
     if dead and pygame.time.get_ticks() - deadTime > 5000 and not menu and not livesScreen:
@@ -579,7 +642,7 @@ while True:
         pygame.mixer.music.play(-1, 0.0)
         speedUp.play()
 
-    # if timer reaches 0 kill mario
+    # if timer reaches 0, die
     if levelTimer == 0 and not dead:
         dead = True
         onGround = False
@@ -589,7 +652,7 @@ while True:
         jump = False
         velocityY = -10
         velocityX = 0
-        marioDie.play()
+        hDie.play()
         pygame.mixer.music.stop()
         deadTime = pygame.time.get_ticks()
 
@@ -607,7 +670,7 @@ while True:
             worldText = MARIOFONT.render("WORLD 1-1", True, WHITE)
             windowSurface.blit(livesText, (310, 240))
             windowSurface.blit(worldText, (240, 170))
-            windowSurface.blit(marioS, (255, 230))
+            windowSurface.blit(hS, (255, 230))
         else:
             if not gameOver:
                 gameOverSound.play()
@@ -622,7 +685,7 @@ while True:
         scoreText = MARIOFONT.render(str(score).zfill(6), True, WHITE)
         coinText = MARIOFONT.render('x%s' % str(coins).zfill(2), True, WHITE)
         timeText = MARIOFONT.render(str(levelTimer).zfill(3), True, WHITE)
-        windowSurface.blit(marioText, (50, 15))
+        windowSurface.blit(hText, (50, 15))
         windowSurface.blit(scoreText, (50, 32))
         windowSurface.blit(coinText, (230, 32))
         windowSurface.blit(levelText, (370, 32))
