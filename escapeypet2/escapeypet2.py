@@ -63,8 +63,8 @@ livesScreenTime = 0
 gameOver = False
 
 #text and menu image
-marioText = MARIOFONT.render('MARIO            WORLD   TIME', True, WHITE)
-levelText = MARIOFONT.render('1-1', True, WHITE)
+marioText = MARIOFONT.render('SKEEVY            ESCAPEY PET', True, WHITE) #'MARIO  WORLD   TIME', True, WHITE
+levelText = MARIOFONT.render('Level 01', True, WHITE)
 menuImg = pygame.image.load("menu.jpg")
 menuImg = pygame.transform.scale(menuImg, (640, 480))
 
@@ -92,9 +92,6 @@ skeevy7 = sprite_sheet.get_image(210, 166, 29, 34)
 
 marioWalk = pyganim.PygAnimation([(skeevy1, 0.1), (skeevy2, 0.1),
                                 (skeevy3, 0.1), (skeevy4,0.1)])
-'''('mario1.png', 0.1),                                   ('mario2.png', 0.1),
-                                  ('mario3.png', 0.1),
-                                  ('mario4.png', 0.1)])'''
 
 scoreCoin = pyganim.PygAnimation([('scoreCoin1.png', 0.5),
                                   ('scoreCoin2.png', 0.13),
@@ -124,7 +121,7 @@ stomp = pygame.mixer.Sound('stomp.wav')
 marioDie = pygame.mixer.Sound('mariodie.wav')
 speedUp = pygame.mixer.Sound('fastTheme.ogg')
 gameOverSound = pygame.mixer.Sound('gameover.wav')
-pygame.mixer.music.load('maintheme.ogg')
+pygame.mixer.music.load('pinacolada.mp3') ##MAIN MUSIC THEME - change below too
 musicPlaying = True
 
 # tiles mario can walk on and hit
@@ -166,6 +163,37 @@ class Platform():
             coin.play()
         windowSurface.blit(self.hitImage, (self.x-cameraX, self.y-cameraY))
         self.hit = True
+
+'''class PowerUp():
+    def __init__(self, x, y, pic, scaleX, scaleY, deadX, deadY, frames, aniSpeed):
+        self.pic = pic
+        self.image1 = [('%s%s.png' % (pic, str(num)), aniSpeed) for num in range(frames)]
+        self.image = pyganim.PygAnimation(self.image1)
+        pyganim.PygAnimation.scale(self.image, (scaleX, scaleY))
+        self.image.play()
+        self.imageD = pygame.image.load('%sDEAD.png' % (pic))
+        self.imageDEAD = pygame.transform.scale(self.imageD, (deadX, deadY))
+        self.x = x
+        self.y = y
+        self.scaleX = scaleX
+        self.scaleY = scaleY
+        self.dead = False
+        self.onGround = True
+        self.enemyMove = -1
+        self.collide = 0
+        self.remove = False
+        self.current = False
+        self.shellMove = False
+
+    def rect(self, cameraX, cameraY):
+        return pygame.Rect(self.x-cameraX, self.y-cameraY, self.scaleX, self.scaleY)
+
+    def update(self, cameraX, cameraY):
+        if not self.dead:
+            self.image.blit(windowSurface, (self.x-cameraX, self.y-cameraY))
+        else:
+            windowSurface.blit(self.imageDEAD, (self.x-cameraX, self.y-cameraY+16))` '''
+
 
 class Enemy():
 
@@ -261,9 +289,9 @@ def buildLevel(level):
             if col == "w":
                 platforms.append( Platform(platX, platY, "smallcastle.png", 160, 160, True, False) )
             if col == "1":
-                enemies.append( Enemy(platX+5, platY, "goomba", 32, 32, 32, 16, 2, 0.1) )
+                enemies.append( Enemy(platX+5, platY, "fly", 32, 32, 32, 16, 2, 0.1) )
             if col == "2":
-                enemies.append( Enemy(platX-5, platY-16, "koopa", 32, 48, 32, 28, 2, 0.2) )
+                enemies.append( Enemy(platX-5, platY-16, "spider", 32, 48, 32, 28, 2, 0.2) )
             platX += 32
         platX = 0
         platY += 32
@@ -284,7 +312,7 @@ while True:
             dead = False
             levelTimer = 400
             startLevel = True
-            pygame.mixer.music.load('maintheme.ogg')
+            pygame.mixer.music.load('pinacolada.mp3') #MAIN THEME -- above too
             pygame.mixer.music.play(-1, 0.0)
             if flip:
                 marioWalk.flip(1, 0)
@@ -332,13 +360,13 @@ while True:
             enemy.collide = 0
             enemy.current = True
             if enemy.dead and pygame.time.get_ticks() - time > 500:
-                if not enemy.pic == "koopa" or not (enemy.x - camera.x >= -400 and enemy.x - camera.x <= WINDOWWIDTH):
+                if not enemy.pic == "fly" or not (enemy.x - camera.x >= -400 and enemy.x - camera.x <= WINDOWWIDTH):
                     enemy.remove = True
             if enemy.x - camera.x >= -400 and enemy.x - camera.x <= WINDOWWIDTH and not enemy.remove:
                 enemy.update(camera.x, camera.y)
                 if not enemy.onGround and not enemy.dead:
                     enemy.y += 3
-                elif not enemy.dead or (enemy.pic == "koopa"):
+                elif not enemy.dead or (enemy.pic == "fly"):
                     enemy.x += enemy.enemyMove
                 for platform in platforms:
                     if platform.x - camera.x >= -400 and platform.x - camera.x <= WINDOWWIDTH:
@@ -357,7 +385,7 @@ while True:
                 for enemy1 in enemies:
                     if enemy1.x - camera.x >= -400 and enemy1.x - camera.x <= WINDOWWIDTH and not enemy1.remove and not enemy1.current:
                         if enemy.rect(camera.x, camera.y).colliderect(enemy1.rect(camera.x, camera.y)):
-                                if enemy1.pic == "koopa" and enemy1.dead:
+                                if enemy1.pic == "fly" and enemy1.dead:
                                     enemy.enemyMove = 0
                                     if not enemy.dead:
                                         time = pygame.time.get_ticks()
@@ -367,10 +395,10 @@ while True:
                                     enemy.enemyMove = 1
                                 else:
                                     enemy.enemyMove = -1
-                if player.colliderect(enemy.rect(camera.x, camera.y)) and ( (enemy.pic == "koopa") or (not enemy.dead and not dead) ):
-                    if player.x < enemy.x and enemy.pic == "koopa" and enemy.dead:
+                if player.colliderect(enemy.rect(camera.x, camera.y)) and ( (enemy.pic == "fly") or (not enemy.dead and not dead) ):
+                    if player.x < enemy.x and enemy.pic == "fly" and enemy.dead:
                         enemy.enemyMove = 5
-                    elif player.x > enemy.x and enemy.pic == "koopa" and enemy.dead:
+                    elif player.x > enemy.x and enemy.pic == "fly" and enemy.dead:
                         enemy.enemyMove = -5
                     elif player.y < enemy.y - 10:
                         enemy.enemyMove = 0
@@ -536,7 +564,7 @@ while True:
     # play level speed up music when almost out of time
     if levelTimer <= 100 and not lowTime:
         lowTime = True
-        pygame.mixer.music.load('fastTheme.mp3')
+        pygame.mixer.music.load('#fastTheme.mp3')
         pygame.mixer.music.play(-1, 0.0)
         speedUp.play()
 
