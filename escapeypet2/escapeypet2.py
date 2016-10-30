@@ -66,6 +66,7 @@ gameOver = False
 marioText = MARIOFONT.render('SKEEVY            ESCAPEY PET', True, WHITE) #'MARIO  WORLD   TIME', True, WHITE
 levelText = MARIOFONT.render('Level 01', True, WHITE)
 menuImg = pygame.image.load("menu.jpg")
+bkground = pygame.image.load("background_2.png")
 menuImg = pygame.transform.scale(menuImg, (640, 480))
 
 #Create sprite animations and hitbox for mario
@@ -109,6 +110,7 @@ marioF = pygame.transform.flip(marioS, 1, 0)
 marioJL = pygame.transform.flip(marioJ, 1, 0)
 pyganim.PygAnimation.scale(marioWalk, (28, 32))
 marioWalk.play()
+
 
 #camera stuff
 camera = pygame.Rect(0, 0, 640, 480)
@@ -298,8 +300,18 @@ def buildLevel(level):
 
 buildLevel(level)
 
+class Background(pygame.sprite.Sprite):
+    def __init__(self, image_file, location):
+        pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
+        self.image = pygame.image.load(image_file)
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+
 # main game loop
 while True:
+    BackGround = Background('background_2.png', [0,0])
+    windowSurface.fill([255, 255, 255]) #REALLY REALLY SLOW
+    windowSurface.blit(BackGround.image, BackGround.rect)
 
     # spawn mario in level 1
     if livesScreen and pygame.time.get_ticks() - livesScreenTime >= 4000 and not menu:
@@ -326,7 +338,6 @@ while True:
 
     # check for mario colliding with platforms
     if not menu:
-        windowSurface.fill(SKYBLUE)
 
         collideTop = 0
         collideLeft = 0
