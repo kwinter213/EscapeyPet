@@ -55,7 +55,7 @@ class Controller(object):
 
 
 def main():
-	Skeevy=Avatar('Skeevy.jpg') #initializes Skeevy
+	Skeevy=Avatar('skeevy.jpg') #initializes Skeevy
 	SkeevyView=AvatarViewer(Skeevy) #initializing the Avatar Viewer
 	models= [Skeevy]
 	controller=Controller(models)
