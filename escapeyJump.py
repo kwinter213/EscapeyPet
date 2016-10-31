@@ -17,10 +17,18 @@ YELLOW = (255,255,0)
 
 TITLE = "ESCAPEY JUMP"
 
+#Starting platforms -- Let's add more variety
+PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
+				(WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20),
+				(WIDTH/4 - 10, HEIGHT*2, 100, 20),
+				(125, HEIGHT -250, 100, 20),
+				(150, 100, 75, 20),
+				]
 
 class Player(pg.sprite.Sprite):
 	vx = 0
 	vy = 0
+	print 'STILL HERE'
 	def __init__(self, game):
 
 		pg.sprite.Sprite.__init__(self)
@@ -44,24 +52,16 @@ class Player(pg.sprite.Sprite):
 		if keys[pg.K_RIGHT]:
 			self.vx = 5
 		self.rect.y += self.vy
-		'''hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-		for hit in hits:
-			if self.vy > 0:
-				self.rect.bottom = hit.rect.top
-			elif self.vy <0:
-				self.rect.top = hit.rect.bottom'''
 		self.vy = 0
-		self.rect.y += self.vy
-		self.rect.y = self.rect.y
-		self.rect.x = self.rect.x
+		self.rect.y = self.game.player.rect.y
 		print self.rect.y
 
 	def jump(self):
-		self.rect.x += 3
+		self.rect.y += 3
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-		self.rect.x += 3
+		self.rect.y += 3
 		if hits:
-			self.vy = 20
+			self.vy = 5
 
 	def calc_grav(self):
 		""" Calculate effect of gravity. """
@@ -71,12 +71,11 @@ class Player(pg.sprite.Sprite):
 		else:
 			self.vy += .35
 
-		if self.rect.y >= HEIGHT - self.rect.height and self.vy >= 0:
-			self.rect.y = HEIGHT - self.rect.height
+		'''if self.rect.y >= HEIGHT - self.rect.height and self.vy >= 0:
+			self.rect.y = 2
 			self.vy = 0
-			print self.rect.y
 		print 'AFTER'
-		print self.rect.y
+		print self.rect.y '''
 
 class Platform(pg.sprite.Sprite):
 	def __init__(self, x, y, width, height):
@@ -103,12 +102,10 @@ class Game:
 		self.platforms = pg.sprite.Group()
 		self.all_sprites.add(self.player)
 
-		p1 = Platform(0, HEIGHT-40, WIDTH, 40)
-		self.all_sprites.add(p1)
-		self.platforms.add(p1)
-		p2 = Platform(WIDTH / 2, HEIGHT * 3/4, 100, 20)
-		self.all_sprites.add(p2)
-		self.platforms.add(p2)
+		for platform in PLATFORMLIST:
+			p = Platform(*platform)
+			self.all_sprites.add(p)
+			self.platforms.add(p)
 
 		self.run()
 
@@ -127,10 +124,11 @@ class Game:
 
 		# See if we are on platform
 		if hits:
-			self.player.rect.y = 2*hits[0].rect.bottom
+			self.vy = 0
+			self.player.rect.y = self.player.rect.height + hits[0].rect.bottom
+			self.player.rect.y = 0
 			print '////////LOL//////////'
-			print player.rect.y
-			self.player.vy = 0
+			time.sleep(2)
 
 	def events(self):
 		#GAME LOOP events
