@@ -16,8 +16,6 @@ GREEN = (0,255,0)
 YELLOW = (255,255,0)
 
 TITLE = "ESCAPEY JUMP"
-accl = .5
-friction = -.13
 
 
 class Player(pg.sprite.Sprite):
@@ -29,9 +27,12 @@ class Player(pg.sprite.Sprite):
 		self.image = pg.Surface((30,40))
 		self.image.fill(YELLOW)
 		self.rect = self.image.get_rect()
-		#self.rect.center = (WIDTH /2, HEIGHT/2)
+		self.rect.x = WIDTH /2
+		self.rect.y = HEIGHT / 3
 		self.vx = 0
 		self.vy = 0
+
+		print "INITIAL PLAYER"
 
 	def update(self):
 		self.calc_grav()
@@ -45,12 +46,14 @@ class Player(pg.sprite.Sprite):
 		self.rect.x += self.vx
 		self.rect.y += self.vy
 
+		print 'PLAYER UPDATE'
+
 	def jump(self):
 		self.rect.x += 3
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
 		self.rect.x += 3
 		if hits:
-			self.vel.y = 20
+			self.vy = 20
 
 	def calc_grav(self):
 		""" Calculate effect of gravity. """
@@ -111,8 +114,6 @@ class Game:
 		if hits:
 			self.player.rect.y = HEIGHT - hits[0].rect.top
 			self.player.vy = 0
-			time.sleep(1)
-			print self.player.rect.y ## Need a way to stop level
 
 	def events(self):
 		#GAME LOOP events
