@@ -38,7 +38,7 @@ class SpriteSheet(object): #to grab single images from a sheet of images
 class Platform(pygame.sprite.Sprite): #what the player jumps
 	def __init__(self, spritesheet_im):
 		pygame.sprite.Sprite.__init__(self)
-		spritesheet = SpriteSheet('platforms.png') #Grabs sheet
+		spritesheet = SpriteSheet('tiles_spritesheet.png') #Grabs sheet
 		self.image = spritesheet.grabimage(spritesheet_im[0],
 										 spritesheet_im[1],
 										 spritesheet_im[2],
@@ -86,7 +86,7 @@ class Level01(Level):
 	''' Going to setup level 1 '''
 	def __init__(self, avatar):
 		Level.__init__(self, avatar)
-		self.background = pygame.image.load("background_1.png")
+		self.background = pygame.image.load('background_1.png')
 		self.background.set_colorkey(c.WHITE)
 		self.lvlimit = -2500 #??
 
@@ -116,7 +116,7 @@ class Level01(Level):
 class Level02(Level):
 	def __init__(self, avatar):
 		Level.__init__(self, avatar)
-		self.background = pygame.image.load("background_2.png")
+		self.background = pygame.image.load('background_2.png')
 		self.background.set_colorkey(c.WHITE)
 		self.lvlimit = -2500 #??
 
@@ -279,7 +279,7 @@ def main(): # MAIN PROGRAM
 				if event.key == pygame.K_RIGHT and avatar.dx >0:
 					avatar.stop()
 
-		pygame.mixer.music.load('pinacolada')
+		pygame.mixer.music.load('pinacolada.mp3')
 		pygame.mixer.music.play(-1, 0.0)
 
 		sprites_active.update()

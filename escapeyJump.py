@@ -192,8 +192,8 @@ class Game:
 		pass
 
 	def show_go_screen():
-
 		pass
+
 	def drawtext(self, text, size, color, x, y):
 		font = pg.font.Font(self.font,size)
 		texts = font.render(text,True, color)
