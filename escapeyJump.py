@@ -19,34 +19,44 @@ TITLE = "ESCAPEY JUMP"
 
 
 class Player(pg.sprite.Sprite):
-
+	vx = 0
+	vy = 0
 	def __init__(self, game):
 
 		pg.sprite.Sprite.__init__(self)
 		self.game = game
-		self.image = pg.Surface((30,40))
+		height = 50
+		width = 30
+		self.image = pg.Surface([width,height])
 		self.image.fill(YELLOW)
-		self.rect = self.image.get_rect()
-		self.rect.x = WIDTH /2
-		self.rect.y = HEIGHT / 3
-		self.vx = 0
-		self.vy = 0
 
-		print "INITIAL PLAYER"
+		self.rect = Rect(height,width,66, 92) #self.image.get_rect()
+		self.rect.x = (WIDTH/2)
+		self.rect.y = (HEIGHT/3)
 
 	def update(self):
 		self.calc_grav()
 
+		self.rect.x += self.vx
 		keys = pg.key.get_pressed()
 		if keys[pg.K_LEFT]:
 			self.vx = -5
+			self.vy = 0
 		if keys[pg.K_RIGHT]:
 			self.vx = 5
-
-		self.rect.x += self.vx
+			self.vy = 0
 		self.rect.y += self.vy
-
-		print 'PLAYER UPDATE'
+		'''hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+		for hit in hits:
+			if self.vy > 0:
+				self.rect.bottom = hit.rect.top
+			elif self.vy <0:
+				self.rect.top = hit.rect.bottom'''
+		self.vy = 0
+		self.rect.y += self.vy
+		self.rect.y = self.rect.y
+		self.rect.x = self.rect.x
+		print self.rect.y
 
 	def jump(self):
 		self.rect.x += 3
@@ -57,22 +67,32 @@ class Player(pg.sprite.Sprite):
 
 	def calc_grav(self):
 		""" Calculate effect of gravity. """
+		print '+++++++++++BEFORE++++++++++++'
+		print self.rect.y
+
 		if self.vy == 0:
 			self.vy = 1
 		else:
 			self.vy += .35
 
+		if self.rect.y >= HEIGHT - self.rect.height and self.vy >= 0:
+			self.rect.y = HEIGHT - self.rect.height
+			self.vy = 0
+			print self.rect.y
+
+		print '+++++++++++AFTER++++++++++++'
+		print self.rect.y
+
 class Platform(pg.sprite.Sprite):
-	def __init__(self, x, y, w, h):
+	def __init__(self, x, y, width, height):
 		pg.sprite.Sprite.__init__(self)
-		self.image = pg.Surface((w,h))
+		self.image = pg.Surface((width, height))
 		self.image.fill(GREEN)
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
 
 class Game:
-
 	def __init__(self):
 		pg.init()
 		pg.mixer.init()
