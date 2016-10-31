@@ -274,7 +274,7 @@ class Game: #This is the jumper game
 		self.screen.fill(WHITE)
 		self.screen.blit(background.image, background.rect)
 		self.all_sprites.draw(self.screen)
-		self.drawtext('SCORE: '+str(+self.points),23,WHITE,WIDTH-WIDTH/4,15)
+		self.drawtext('SKEEVY ESCAPES                  SCORE: '+str(+self.points),23,WHITE,WIDTH/2,15)
 		
 		#AFTTER DRAWING Everything
 		pg.display.flip()
@@ -283,7 +283,7 @@ class Game: #This is the jumper game
 
 		pass
 
-	def show_go_screen():
+	def show_go_screen():	
 
 		pass
 

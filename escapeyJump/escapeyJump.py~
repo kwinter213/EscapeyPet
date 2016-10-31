@@ -13,10 +13,12 @@ Help skeevy the hamster reach the top of his cage! Gain points & stay alive
 
 Background:  https://s-media-cache-ak0.pinimg.com/originals/c2/95/4a/c2954a71ecef875d99e3ca224a7d9415.jpg
 
+Music: GotG album
+
 '''
 
 #UPDATES
-'''The resetting y-pos is back arrgg. Also added music
+'''The resetting y-pos is back arrgg. Also added music.
 
 '''
 
@@ -272,7 +274,7 @@ class Game: #This is the jumper game
 		self.screen.fill(WHITE)
 		self.screen.blit(background.image, background.rect)
 		self.all_sprites.draw(self.screen)
-		self.drawtext('SCORE: '+str(+self.points),23,WHITE,WIDTH-WIDTH/4,15)
+		self.drawtext('SKEEVY                  SCORE: '+str(+self.points),23,WHITE,WIDTH/2,15)
 		
 		#AFTTER DRAWING Everything
 		pg.display.flip()
@@ -281,7 +283,7 @@ class Game: #This is the jumper game
 
 		pass
 
-	def show_go_screen():
+	def show_go_screen():	
 
 		pass
 
