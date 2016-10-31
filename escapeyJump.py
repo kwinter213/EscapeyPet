@@ -30,7 +30,7 @@ class Player(pg.sprite.Sprite):
 		self.image = pg.Surface([width,height])
 		self.image.fill(YELLOW)
 
-		self.rect = Rect(height,width,66, 92) #self.image.get_rect()
+		self.rect = self.image.get_rect()
 		self.rect.x = (WIDTH/2)
 		self.rect.y = (HEIGHT/3)
 
@@ -41,10 +41,8 @@ class Player(pg.sprite.Sprite):
 		keys = pg.key.get_pressed()
 		if keys[pg.K_LEFT]:
 			self.vx = -5
-			self.vy = 0
 		if keys[pg.K_RIGHT]:
 			self.vx = 5
-			self.vy = 0
 		self.rect.y += self.vy
 		'''hits = pg.sprite.spritecollide(self, self.game.platforms, False)
 		for hit in hits:
@@ -67,8 +65,6 @@ class Player(pg.sprite.Sprite):
 
 	def calc_grav(self):
 		""" Calculate effect of gravity. """
-		print '+++++++++++BEFORE++++++++++++'
-		print self.rect.y
 
 		if self.vy == 0:
 			self.vy = 1
@@ -79,8 +75,7 @@ class Player(pg.sprite.Sprite):
 			self.rect.y = HEIGHT - self.rect.height
 			self.vy = 0
 			print self.rect.y
-
-		print '+++++++++++AFTER++++++++++++'
+		print 'AFTER'
 		print self.rect.y
 
 class Platform(pg.sprite.Sprite):
@@ -132,7 +127,9 @@ class Game:
 
 		# See if we are on platform
 		if hits:
-			self.player.rect.y = HEIGHT - hits[0].rect.top
+			self.player.rect.y = 2*hits[0].rect.bottom
+			print '////////LOL//////////'
+			print player.rect.y
 			self.player.vy = 0
 
 	def events(self):
