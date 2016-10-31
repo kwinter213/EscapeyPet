@@ -3,26 +3,23 @@ import math
 import random
 import time
 import os
-#import constants --> separate file?
 
 ''' ESCAPEY GAME 2:30pm 10/31
 
 authors: ChristinaHolman, Kim Winter
 
-Help skeevy the hamster reach the top of his cage! Gain points/stay alive
+Help skeevy the hamster reach the top of his cage! Gain points & stay alive
 
 Background:  https://s-media-cache-ak0.pinimg.com/originals/c2/95/4a/c2954a71ecef875d99e3ca224a7d9415.jpg
 
 '''
 
 #UPDATES
-''' I added background image, text, etc. Going to change image and add music.
-Can you ask the ninjas to help you figure out why the player wont save its y.pos
-after it collides with a platform? Once that's checked, try out the jump motion '''
+'''Still having problem with resetting y-pos and collisions against side'''
 
 '''' GLOBAL CONSTANTS '''
-WIDTH = 369
-HEIGHT = 480
+WIDTH = 450
+HEIGHT = 550
 FPS = 30 #Framerate
 FONT = 'arial'
 
@@ -36,13 +33,12 @@ TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
 CURR_DIR = os.path.dirname(os.path.realpath(__file__))
 
 #Starting platforms -- Let's add more variety
-PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
-				(WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20),
-				(WIDTH/4 - 10, HEIGHT*2, 100, 20),
-				(125, HEIGHT -250, 100, 20),
-				(150, 100, 75, 20),
+PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40), (WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20),
+		(WIDTH/4 - 10, HEIGHT*2, 100, 20), (125, HEIGHT -250, 100, 20),
+		(150, 100, 75, 20),
 				]
-class Spritesheet: #THIS pulls images from spritesheet and copies to separate rects
+
+class Spritesheet: #Pulls images from spritesheet and copies to separate rects
 	def __init__(self,filename):
 		self.spritesheet = pg.image.load(filename).convert()
 	def grabimage(self,x,y,width,height):
@@ -107,7 +103,8 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		img = (self.rect.x // 30) % len(self.walkingright) 
 		self.image = self.walkingright[img]
 		
-		self.rect.x += self.vx
+		if self.rect.x >= 0 or self.rect.x <= WIDTH:		
+			self.rect.x += self.vx
 		
 		#if user preses keys:
 		keys = pg.key.get_pressed()
@@ -127,7 +124,6 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		
 		#trying to the y-pos at collision to save !
 		self.rect.y = self.game.player.rect.y
-		print self.rect.y
 
 	def jump(self): #jump movement only when not in air
 		self.rect.y += 3
@@ -135,6 +131,11 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		self.rect.y += 3
 		if hits:
 			self.vy = 5
+	def stop(self):
+		hits = pg.sprite.spritecollide(self, self.game.platforms, False)	
+		if hits == False:
+			self.vx = 0
+			self.vy = 0
 
 	def calc_grav(self): 
 		#The pseudo-gravitational effect
@@ -192,24 +193,17 @@ class Game: #This is the jumper game
 
 	def update(self): #updating thru running mode
 		self.all_sprites.update()
-		hits = pg.sprite.spritecollide(self.player, self.platforms, False)
 
 		# Check if we are on a platform
 		'''This is problematic. Will stop when hits the sides of platform and
-		not just top or bottom '''
+		not just top or bottom '''	
+		hits = pg.sprite.spritecollide(self.player, self.platforms, False)	
 		if hits:
-			self.vy = 0 #stop motion
 			#set y-position to player height + platform height
-			self.player.rect.y = self.player.rect.height + hits[0].rect.bottom
+			self.player.rect.y = self.player.rect.height + hits[0].rect.top +10
+			self.vy = 0 #stop motion
+			self.vx = 0
 			
-			#debugging: tried resetting pos to 0			
-			self.player.rect.y = 0
-			
-			#debugging: making sure update is actually happening
-			print '////////LOL//////////'
-			
-			#debugging: delay to sit collision			
-			time.sleep(2)
 
 		#Scroll further up once reach checkpoint (VERTICAL)
 		if self.player.rect.top <= HEIGHT /4:
@@ -221,7 +215,7 @@ class Game: #This is the jumper game
 					self.points += 10
 		#GAME OVER
 		if self.player.rect.bottom > HEIGHT:
-			#self.playing = False
+			self.playing = False
 			for sprite in self.all_sprites:
 				sprite.rect.y -= max(self.player.vy, 10)
 				if sprite.rect.bottom <0:
@@ -248,6 +242,8 @@ class Game: #This is the jumper game
 			if event.type == pg.KEYDOWN:
 				if event.key == pg.K_SPACE:
 					self.player.jump()
+			if event.type == pg.KEYUP:				
+				self.player.stop()
 
 
 	def draw(self):
@@ -255,7 +251,7 @@ class Game: #This is the jumper game
 		self.screen.fill(WHITE)
 		self.screen.blit(background.image, background.rect)
 		self.all_sprites.draw(self.screen)
-		self.drawtext(str(self.points),23,WHITE,WIDTH/2,15)
+		self.drawtext('SCORE: '+str(+self.points),23,WHITE,WIDTH-WIDTH/4,15)
 		
 		#AFTTER DRAWING Everything
 		pg.display.flip()
