@@ -3,8 +3,9 @@ import math
 import random
 import time
 import os
+from os import path
 
-''' ESCAPEY GAME 2:30pm 10/31
+''' ESCAPEY GAME 6:40pm 10/31
 
 authors: ChristinaHolman, Kim Winter
 
@@ -12,10 +13,14 @@ Help skeevy the hamster reach the top of his cage! Gain points & stay alive
 
 Background:  https://s-media-cache-ak0.pinimg.com/originals/c2/95/4a/c2954a71ecef875d99e3ca224a7d9415.jpg
 
+Music: GotG album
+
 '''
 
 #UPDATES
-'''Still having problem with resetting y-pos and collisions against side'''
+'''The resetting y-pos is back arrgg. Also added music.
+
+'''
 
 '''' GLOBAL CONSTANTS '''
 WIDTH = 450
@@ -30,7 +35,7 @@ GREEN = (0,255,0)
 YELLOW = (255,255,0)
 
 TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
-CURR_DIR = os.path.dirname(os.path.realpath(__file__))
+self_dir = os.path.dirname(os.path.realpath(__file__))
 
 #Starting platforms -- Let's add more variety
 PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40), (WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20),
@@ -127,17 +132,20 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		self.rect.y = self.game.player.rect.y
 		if (self.rect.x > self.rightSide):
 			self.rect.x = self.rightSide
-		if self.rect.x < self.width:
+		if self.rect.x < self.width: #Leftside of screen
 			self.rect.x = self.width
 		
 
 	def jump(self): #jump movement only when not in air
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-		if hits == FALSE:
+		if hits:
+			self.dy = 0
+		else:
 			self.rect.y += 3
 			#self.rect.y -= 3
+		
 
-		print '+++++++JUMP+++++++'
+		print '+++++++JUMP+++++++' #Not sure what's up?
 		print self.rect.y
 	def stop(self):
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)	
@@ -173,6 +181,11 @@ class Game: #This is the jumper game
 		self.clock = pg.time.Clock()
 		self.running = True
 		self.font = pg.font.match_font(FONT)
+		self.dir = path.dirname(__file__)
+
+	def load(self):
+		self.dir = path.dirname(__File__)
+		self.leap = pg.mixer.Sound(path.join(self.dir, 'leap.ogg'))
 		
 	def new(self): 
 		#New Game -- all the things to start with
@@ -187,21 +200,23 @@ class Game: #This is the jumper game
 			p = Platform(*platform)
 			self.all_sprites.add(p)
 			self.platforms.add(p)
-
+		pg.mixer.music.load(path.join(self.dir, 'pinacolada.mp3')) 
+		##I'll put MarvinGaye in there too
 		self.run()
 
 	def run(self):
 		# Game Loop -- keeps the game running
+		pg.mixer.music.play(-1) #loops=-1 infinite music		
 		self.playing = True
 		while self.playing:
 			self.clock.tick(FPS)
 			self.events()
 			self.update()
 			self.draw()
+		pg.mixer.music.fadeout(300) #fades out, not stop
 
 	def update(self): #updating thru running mode
 		self.all_sprites.update()
-		print 'UPDATING'
 
 		# Check if we are on a platform
 		'''This is problematic. Will stop when hits the sides of platform and
@@ -209,9 +224,8 @@ class Game: #This is the jumper game
 		hits = pg.sprite.spritecollide(self.player, self.platforms, False)	
 		if hits:
 			#set y-position to player height + platform height			
-			self.player.rect.y = hits[0].rect.top
+			self.player.rect.y = HEIGHT - hits[0].rect.top
 			self.vy = 0 #stop motion
-			time.sleep(2) #delay to see if actually hits
 
 		#Scroll further up once reach checkpoint (VERTICAL)
 		if self.player.rect.top <= HEIGHT /4:
@@ -250,6 +264,7 @@ class Game: #This is the jumper game
 			if event.type == pg.KEYDOWN:
 				if event.key == pg.K_SPACE:
 					self.player.jump()
+					self.leap.play()
 			if event.type == pg.KEYUP:				
 				self.player.stop()
 
