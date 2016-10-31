@@ -7,13 +7,18 @@ import os
 
 ''' ESCAPEY GAME 2:30pm 10/31
 
-authors: Christin aHolman, Kim Winter
+authors: ChristinaHolman, Kim Winter
 
 Help skeevy the hamster reach the top of his cage! Gain points/stay alive
 
 Background:  https://s-media-cache-ak0.pinimg.com/originals/c2/95/4a/c2954a71ecef875d99e3ca224a7d9415.jpg
 
 '''
+
+#UPDATES
+''' I added background image, text, etc. Going to change image and add music.
+Can you ask the ninjas to help you figure out why the player wont save its y.pos
+after it collides with a platform? Once that's checked, try out the jump motion '''
 
 '''' GLOBAL CONSTANTS '''
 WIDTH = 369
@@ -143,12 +148,12 @@ class Platform(pg.sprite.Sprite):
 	def __init__(self, x, y, width, height):
 		pg.sprite.Sprite.__init__(self)
 		self.image = pg.Surface((width, height))
-		self.image.fill(PURPLE)
+		self.image.fill(BLACK)
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
 
-background = Background('kitchen.jpg', [0,0])
+background = Background('room.jpg', [0,0]) #
 class Game:
 	def __init__(self):
 		pg.init()
