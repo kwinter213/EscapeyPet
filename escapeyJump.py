@@ -4,10 +4,19 @@ import random
 import time
 #import constants --> separate file?
 
+''' ESCAPEY GAME 2:30pm 10/31
+
+authors: Christin aHolman, Kim Winter
+
+Help skeevy the hamster reach the top of his cage! Gain points/stay alive
+
+'''
+
 '''' GLOBAL CONSTANTS '''
 WIDTH = 369
 HEIGHT = 480
 FPS = 30 #Framerate
+FONT = 'arial'
 
 WHITE = (255,255,255)
 BLACK = (0, 0, 0)
@@ -15,7 +24,7 @@ PURPLE = (255, 0, 255)
 GREEN = (0,255,0)
 YELLOW = (255,255,0)
 
-TITLE = "ESCAPEY JUMP"
+TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
 
 #Starting platforms -- Let's add more variety
 PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
@@ -81,7 +90,7 @@ class Platform(pg.sprite.Sprite):
 	def __init__(self, x, y, width, height):
 		pg.sprite.Sprite.__init__(self)
 		self.image = pg.Surface((width, height))
-		self.image.fill(GREEN)
+		self.image.fill(PURPLE)
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
@@ -94,9 +103,11 @@ class Game:
 		pg.display.set_caption(TITLE)
 		self.clock = pg.time.Clock()
 		self.running = True
+		self.font = pg.font.match_font(FONT)
 
 	def new(self):
 		#New Game
+		self.points = 0
 		self.all_sprites = pg.sprite.Group()
 		self.player = Player(self)
 		self.platforms = pg.sprite.Group()
@@ -130,6 +141,32 @@ class Game:
 			print '////////LOL//////////'
 			time.sleep(2)
 
+		#Scroll further up once reach checkpoint (VERTICAL)
+		if self.player.rect.top <= HEIGHT /4:
+			self.player.rect.y += abs(self.player.vy) #Move at same vel in opp direction
+			for form in self.platforms:
+				form.rect.y += abs(self.player.vy)
+				if form.rect.top >= HEIGHT:
+					form.kill() #get rid of platforms downbelow
+					self.points += 10
+		#GAME OVER
+		if self.player.rect.bottom > HEIGHT:
+			#self.playing = False
+			for sprite in self.all_sprites:
+				sprite.rect.y -= max(self.player.vy, 10)
+				if sprite.rect.bottom <0:
+					sprite.kill()
+		if len(self.platforms) == 0:
+			self.playing = False #stop game and restart
+		#Make new platforms
+		while len(self.platforms) < 5:
+			width_p = random.randrange(50, WIDTH/2)
+			p = Platform(random.randrange(0,WIDTH-width_p),
+							random.randrange(-75,-30),
+							width_p, 20)
+			self.platforms.add(p)
+			self.all_sprites.add(p)
+
 	def events(self):
 		#GAME LOOP events
 		for event in pg.event.get():
@@ -146,6 +183,7 @@ class Game:
 		#Draw / render
 		self.screen.fill(WHITE)
 		self.all_sprites.draw(self.screen)
+		self.drawtext(str(self.points),23,WHITE,WIDTH/2,15)
 		#AFTTER DRAWING Everything
 		pg.display.flip()
 
@@ -156,6 +194,12 @@ class Game:
 	def show_go_screen():
 
 		pass
+	def drawtext(self, text, size, color, x, y):
+		font = pg.font.Font(self.font,size)
+		texts = font.render(text,True, color)
+		textrect = texts.get_rect()
+		textrect.midtop = (x,y)
+		self.screen.blit(texts,textrect)
 
 g = Game()
 g.menu()
