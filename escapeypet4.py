@@ -279,6 +279,9 @@ def main(): # MAIN PROGRAM
 				if event.key == pygame.K_RIGHT and avatar.dx >0:
 					avatar.stop()
 
+		pygame.mixer.music.load('pinacolada')
+		pygame.mixer.music.play(-1, 0.0)
+
 		sprites_active.update()
 		currentlevel.update()
 
