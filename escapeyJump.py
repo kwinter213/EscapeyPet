@@ -2,6 +2,7 @@ import pygame as pg
 import math
 import random
 import time
+import os
 #import constants --> separate file?
 
 ''' ESCAPEY GAME 2:30pm 10/31
@@ -9,6 +10,8 @@ import time
 authors: Christin aHolman, Kim Winter
 
 Help skeevy the hamster reach the top of his cage! Gain points/stay alive
+
+Background:  https://s-media-cache-ak0.pinimg.com/originals/c2/95/4a/c2954a71ecef875d99e3ca224a7d9415.jpg
 
 '''
 
@@ -25,6 +28,7 @@ GREEN = (0,255,0)
 YELLOW = (255,255,0)
 
 TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
+CURR_DIR = os.path.dirname(os.path.realpath(__file__))
 
 #Starting platforms -- Let's add more variety
 PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
@@ -33,10 +37,28 @@ PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
 				(125, HEIGHT -250, 100, 20),
 				(150, 100, 75, 20),
 				]
+class Spritesheet:
+	def __init__(self,filename):
+		self.spritesheet = pg.image.load(filename).convert()
+	def grabimage(self,x,y,width,height):
+		image = pg.Surface([width, height]).convert() #new blank picture
+		image.blit(self.spritesheet, (0, 0), (x, y, width, height))
+		#This makes a copy of that image and pastes it to a smaller box
+		image.set_colorkey(BLACK)
+		return image
+
+class Background(pg.sprite.Sprite):
+	def __init__(self, image_file, location):
+		pg.sprite.Sprite.__init__(self)  #call Sprite initializer
+		self.image = pg.image.load(image_file)
+		self.rect = self.image.get_rect()
+		self.rect.left, self.rect.top = location
 
 class Player(pg.sprite.Sprite):
 	vx = 0
 	vy = 0
+	walkingleft = [] #holds all images of animated walking
+	walkingright = []
 	print 'STILL HERE'
 	def __init__(self, game):
 
@@ -46,20 +68,56 @@ class Player(pg.sprite.Sprite):
 		width = 30
 		self.image = pg.Surface([width,height])
 		self.image.fill(YELLOW)
+		#self.pic = pg.image.load(CURR_DIR + "/skeevy2.png").convert_alpha()
+		print 'FOUND IMAGE'
 
-		self.rect = self.image.get_rect()
+		'''self.rect = self.image.get_rect()
+		self.rect.x = (WIDTH/2)
+		self.rect.y = (HEIGHT/3)'''
+
+		#Spritesheet or icon
+		spritesheet = Spritesheet("skeevy2.png")
+		skeevy1 = spritesheet.grabimage(0, 0, 23, 32)
+		skeevy2 = spritesheet.grabimage(84, 0, 26, 27)
+		skeevy3 = spritesheet.grabimage(127, 0, 25, 27)
+		skeevy4 = spritesheet.grabimage(169, 0, 26, 28)
+		self.walkingright.append(skeevy1)
+		self.walkingright.append(skeevy2)
+		self.walkingright.append(skeevy3)
+		self.walkingright.append(skeevy4)
+
+		image = skeevy2
+		skeevy5 = pg.transform.flip(image, True, False)
+		self.walkingleft.append(skeevy5)
+		image = skeevy3
+		skeevy6 = pg.transform.flip(image, True, False)
+		self.walkingleft.append(skeevy6)
+		image = skeevy4
+		skeevy7 = pg.transform.flip(image, True, False)
+		self.walkingleft.append(skeevy7)
+
+		self.image = self.walkingright[0]
+		self.rect = self.image.get_rect() #set reference
 		self.rect.x = (WIDTH/2)
 		self.rect.y = (HEIGHT/3)
 
 	def update(self):
-		self.calc_grav()
-
+		self.calc_grav() #This is the falling motion imitating gravity effect
+		img = (self.rect.x // 30) % len(self.walkingright)
+		self.image = self.walkingright[img]
+		
 		self.rect.x += self.vx
 		keys = pg.key.get_pressed()
 		if keys[pg.K_LEFT]:
+			img = (self.rect.x // 30) % len(self.walkingleft)
+			self.image = self.walkingleft[img]			
 			self.vx = -5
+			
 		if keys[pg.K_RIGHT]:
+			img = (self.rect.x // 30) % len(self.walkingright)
+			self.image = self.walkingright[img]			
 			self.vx = 5
+			
 		self.rect.y += self.vy
 		self.vy = 0
 		self.rect.y = self.game.player.rect.y
@@ -73,18 +131,13 @@ class Player(pg.sprite.Sprite):
 			self.vy = 5
 
 	def calc_grav(self):
-		""" Calculate effect of gravity. """
+		""" The pseudo-gravitational effect """
 
 		if self.vy == 0:
 			self.vy = 1
 		else:
 			self.vy += .35
 
-		'''if self.rect.y >= HEIGHT - self.rect.height and self.vy >= 0:
-			self.rect.y = 2
-			self.vy = 0
-		print 'AFTER'
-		print self.rect.y '''
 
 class Platform(pg.sprite.Sprite):
 	def __init__(self, x, y, width, height):
@@ -95,6 +148,7 @@ class Platform(pg.sprite.Sprite):
 		self.rect.x = x
 		self.rect.y = y
 
+background = Background('kitchen.jpg', [0,0])
 class Game:
 	def __init__(self):
 		pg.init()
@@ -104,7 +158,7 @@ class Game:
 		self.clock = pg.time.Clock()
 		self.running = True
 		self.font = pg.font.match_font(FONT)
-
+		
 	def new(self):
 		#New Game
 		self.points = 0
@@ -182,6 +236,7 @@ class Game:
 	def draw(self):
 		#Draw / render
 		self.screen.fill(WHITE)
+		self.screen.blit(background.image, background.rect)
 		self.all_sprites.draw(self.screen)
 		self.drawtext(str(self.points),23,WHITE,WIDTH/2,15)
 		#AFTTER DRAWING Everything
