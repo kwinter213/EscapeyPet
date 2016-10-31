@@ -42,7 +42,7 @@ PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
 				(125, HEIGHT -250, 100, 20),
 				(150, 100, 75, 20),
 				]
-class Spritesheet:
+class Spritesheet: #THIS pulls images from spritesheet and copies to separate rects
 	def __init__(self,filename):
 		self.spritesheet = pg.image.load(filename).convert()
 	def grabimage(self,x,y,width,height):
@@ -52,20 +52,20 @@ class Spritesheet:
 		image.set_colorkey(BLACK)
 		return image
 
-class Background(pg.sprite.Sprite):
+class Background(pg.sprite.Sprite): #Function used to display background from file
 	def __init__(self, image_file, location):
 		pg.sprite.Sprite.__init__(self)  #call Sprite initializer
 		self.image = pg.image.load(image_file)
 		self.rect = self.image.get_rect()
 		self.rect.left, self.rect.top = location
 
-class Player(pg.sprite.Sprite):
+class Player(pg.sprite.Sprite): #Creates the player/user
 	vx = 0
 	vy = 0
 	walkingleft = [] #holds all images of animated walking
 	walkingright = []
-	print 'STILL HERE'
-	def __init__(self, game):
+
+	def __init__(self, game): #constructs player features and image
 
 		pg.sprite.Sprite.__init__(self)
 		self.game = game
@@ -73,14 +73,8 @@ class Player(pg.sprite.Sprite):
 		width = 30
 		self.image = pg.Surface([width,height])
 		self.image.fill(YELLOW)
-		#self.pic = pg.image.load(CURR_DIR + "/skeevy2.png").convert_alpha()
-		print 'FOUND IMAGE'
 
-		'''self.rect = self.image.get_rect()
-		self.rect.x = (WIDTH/2)
-		self.rect.y = (HEIGHT/3)'''
-
-		#Spritesheet or icon
+		#Making the animation frames from spritesheet
 		spritesheet = Spritesheet("skeevy2.png")
 		skeevy1 = spritesheet.grabimage(0, 0, 23, 32)
 		skeevy2 = spritesheet.grabimage(84, 0, 26, 27)
@@ -106,12 +100,16 @@ class Player(pg.sprite.Sprite):
 		self.rect.x = (WIDTH/2)
 		self.rect.y = (HEIGHT/3)
 
-	def update(self):
-		self.calc_grav() #This is the falling motion imitating gravity effect
-		img = (self.rect.x // 30) % len(self.walkingright)
+	def update(self): #update the user thru the game
+		self.calc_grav() #Falling motion imitating gravity effect
+		
+		#sets initial image
+		img = (self.rect.x // 30) % len(self.walkingright) 
 		self.image = self.walkingright[img]
 		
 		self.rect.x += self.vx
+		
+		#if user preses keys:
 		keys = pg.key.get_pressed()
 		if keys[pg.K_LEFT]:
 			img = (self.rect.x // 30) % len(self.walkingleft)
@@ -122,21 +120,24 @@ class Player(pg.sprite.Sprite):
 			img = (self.rect.x // 30) % len(self.walkingright)
 			self.image = self.walkingright[img]			
 			self.vx = 5
-			
+		
+		#change y position based on velocity	
 		self.rect.y += self.vy
 		self.vy = 0
+		
+		#trying to the y-pos at collision to save !
 		self.rect.y = self.game.player.rect.y
 		print self.rect.y
 
-	def jump(self):
+	def jump(self): #jump movement only when not in air
 		self.rect.y += 3
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
 		self.rect.y += 3
 		if hits:
 			self.vy = 5
 
-	def calc_grav(self):
-		""" The pseudo-gravitational effect """
+	def calc_grav(self): 
+		#The pseudo-gravitational effect
 
 		if self.vy == 0:
 			self.vy = 1
@@ -144,18 +145,18 @@ class Player(pg.sprite.Sprite):
 			self.vy += .35
 
 
-class Platform(pg.sprite.Sprite):
+class Platform(pg.sprite.Sprite): #creates our platforms/levers
 	def __init__(self, x, y, width, height):
 		pg.sprite.Sprite.__init__(self)
 		self.image = pg.Surface((width, height))
-		self.image.fill(BLACK)
+		self.image.fill(YELLOW)
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
 
-background = Background('room.jpg', [0,0]) #
-class Game:
-	def __init__(self):
+background = Background('room.jpg', [0,0]) #makes background image w/ earlier function
+class Game: #This is the jumper game
+	def __init__(self): #sets up parameters
 		pg.init()
 		pg.mixer.init()
 		self.screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -164,14 +165,15 @@ class Game:
 		self.running = True
 		self.font = pg.font.match_font(FONT)
 		
-	def new(self):
-		#New Game
+	def new(self): 
+		#New Game -- all the things to start with
 		self.points = 0
 		self.all_sprites = pg.sprite.Group()
 		self.player = Player(self)
 		self.platforms = pg.sprite.Group()
 		self.all_sprites.add(self.player)
 
+		#sets up the platforms
 		for platform in PLATFORMLIST:
 			p = Platform(*platform)
 			self.all_sprites.add(p)
@@ -180,7 +182,7 @@ class Game:
 		self.run()
 
 	def run(self):
-		# Game Loop
+		# Game Loop -- keeps the game running
 		self.playing = True
 		while self.playing:
 			self.clock.tick(FPS)
@@ -188,21 +190,30 @@ class Game:
 			self.update()
 			self.draw()
 
-	def update(self):
+	def update(self): #updating thru running mode
 		self.all_sprites.update()
 		hits = pg.sprite.spritecollide(self.player, self.platforms, False)
 
-		# See if we are on platform
+		# Check if we are on a platform
+		'''This is problematic. Will stop when hits the sides of platform and
+		not just top or bottom '''
 		if hits:
-			self.vy = 0
+			self.vy = 0 #stop motion
+			#set y-position to player height + platform height
 			self.player.rect.y = self.player.rect.height + hits[0].rect.bottom
+			
+			#debugging: tried resetting pos to 0			
 			self.player.rect.y = 0
+			
+			#debugging: making sure update is actually happening
 			print '////////LOL//////////'
+			
+			#debugging: delay to sit collision			
 			time.sleep(2)
 
 		#Scroll further up once reach checkpoint (VERTICAL)
 		if self.player.rect.top <= HEIGHT /4:
-			self.player.rect.y += abs(self.player.vy) #Move at same vel in opp direction
+			self.player.rect.y += abs(self.player.vy) #Move at same vel in opp dir
 			for form in self.platforms:
 				form.rect.y += abs(self.player.vy)
 				if form.rect.top >= HEIGHT:
@@ -217,6 +228,7 @@ class Game:
 					sprite.kill()
 		if len(self.platforms) == 0:
 			self.playing = False #stop game and restart
+		
 		#Make new platforms
 		while len(self.platforms) < 5:
 			width_p = random.randrange(50, WIDTH/2)
@@ -239,11 +251,12 @@ class Game:
 
 
 	def draw(self):
-		#Draw / render
+		#things to put on screen
 		self.screen.fill(WHITE)
 		self.screen.blit(background.image, background.rect)
 		self.all_sprites.draw(self.screen)
 		self.drawtext(str(self.points),23,WHITE,WIDTH/2,15)
+		
 		#AFTTER DRAWING Everything
 		pg.display.flip()
 
@@ -254,7 +267,9 @@ class Game:
 	def show_go_screen():
 
 		pass
+
 	def drawtext(self, text, size, color, x, y):
+		#all the text
 		font = pg.font.Font(self.font,size)
 		texts = font.render(text,True, color)
 		textrect = texts.get_rect()
