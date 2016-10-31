@@ -144,7 +144,7 @@ class Avatar(pygame.sprite.Sprite):
 	def __init__(self): #Kim: removed *image to make animation
 		pygame.sprite.Sprite.__init__(self)
 
-		spritesheet = SpriteSheet("skeevy2.png")
+		spritesheet = SpriteSheet('skeevy2.png')
 		#Images just for walking right
 		skeevy1 = spritesheet.grabimage(0, 0, 23, 32)
 		skeevy2 = spritesheet.grabimage(84, 0, 26, 27)

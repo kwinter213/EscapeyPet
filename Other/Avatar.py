@@ -53,7 +53,6 @@ class Controller(object):
 		self.models=models
 
 	def handle_event(self, event):
-		print event
 		if event.type==pygame.MOUSEBUTTONDOWN: #jump! :D
 			self.models[0].move_right() #specific to Skeevy being the first model
 		if event.type==pygame.KEYDOWN: #need to figure out how these pygame commands work
