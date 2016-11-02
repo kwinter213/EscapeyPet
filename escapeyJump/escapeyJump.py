@@ -5,10 +5,8 @@ authors: ChristinaHolman, Kim Winter
 Help skeevy the hamster reach the top of his cage! Gain points & stay alive
 
 Background:  https://s-media-cache-ak0.pinimg.com/originals/c2/95/4a/c2954a71ecef875d99e3ca224a7d9415.jpg
-
 Music: GotG album 'Pina Colada'
-
-Jump sound: 'justinarmstrong'
+Jump sound: 'justinarmstrong' https://github.com/justinmeister/Mario-Level-1/tree/master/resources
 
 '''
 
