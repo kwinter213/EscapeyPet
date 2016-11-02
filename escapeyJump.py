@@ -200,9 +200,9 @@ class Game: #This is the jumper game
 		not just top or bottom '''	
 		hits = pg.sprite.spritecollide(self.player, self.platforms, False)	
 		if hits:
-			#set y-position to player height + platform height
-			self.vy = 0 #stop motion			
+			#set y-position to player height + platform height			
 			self.player.rect.y = hits[0].rect.top
+			self.vy = 0 #stop motion
 			print player.rect.y #+++++HERE+++++ Not happening
 			time.sleep(2) #delay to see if actually hits
 
