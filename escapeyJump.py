@@ -42,6 +42,7 @@ PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40),
 				(125, HEIGHT -250, 100, 20),
 				(150, 100, 75, 20),
 				]
+
 class Spritesheet: #THIS pulls images from spritesheet and copies to separate rects
 	def __init__(self,filename):
 		self.spritesheet = pg.image.load(filename).convert()
@@ -127,7 +128,6 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		
 		#trying to the y-pos at collision to save !
 		self.rect.y = self.game.player.rect.y
-		print self.rect.y
 
 	def jump(self): #jump movement only when not in air
 		self.rect.y += 3
@@ -201,12 +201,10 @@ class Game: #This is the jumper game
 			self.vy = 0 #stop motion
 			#set y-position to player height + platform height
 			self.player.rect.y = self.player.rect.height + hits[0].rect.bottom
+			print hits[0].rect.bottom
+			print self.player.rect.height
+			print self.player.rect.y
 			
-			#debugging: tried resetting pos to 0			
-			self.player.rect.y = 0
-			
-			#debugging: making sure update is actually happening
-			print '////////LOL//////////'
 			
 			#debugging: delay to sit collision			
 			time.sleep(2)
@@ -261,7 +259,6 @@ class Game: #This is the jumper game
 		pg.display.flip()
 
 	def menu(self):
-
 		pass
 
 	def show_go_screen():
