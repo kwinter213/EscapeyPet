@@ -43,7 +43,7 @@ TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
 self_dir = os.path.dirname(os.path.realpath(__file__))
 
 #Starting platforms -- Let's add more variety
-PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40), (WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20),
+PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40), (WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20), 
 		(WIDTH/4 - 10, HEIGHT*2, 100, 20), (125, HEIGHT -250, 100, 20),
 		(150, 100, 75, 20),
 				]
@@ -159,9 +159,8 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		'''DEBUG: Not being called correctly in events()'''
 		#if we hit anything don't move
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-		if hits == False: #actually not sure if we need the if statement
-			self.vx = 0
-			self.vy = 0
+		self.vx = 0
+		self.vy = 0
 
 	def calc_grav(self):
 		#The pseudo-gravitational effect
@@ -233,7 +232,9 @@ class Game: #This is the jumper game
 		if hits:
 			#set y-position to where platform is
 			'''DEBUG: resets at center height once hits 1/4 from bottom '''
-			self.player.rect.y = HEIGHT - hits[0].rect.bottom -2
+			self.player.rect.y = hits[0].rect.top -20
+			print HEIGHT
+			print hits[0].rect.bottom
 			self.vy = 0 #stop motion
 
 		#Scroll further up once reach checkpoint (VERTICAL)
