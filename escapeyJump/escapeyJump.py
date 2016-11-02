@@ -1,6 +1,6 @@
 ''' ESCAPEY GAME 12:20am 11/3/2016
 
-authors: ChristinaHolman, Kim Winter
+authors: Christina Holman, Kim Winter
 
 Help skeevy the hamster reach the top of his cage! Gain points & stay alive
 
@@ -43,7 +43,8 @@ TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
 self_dir = os.path.dirname(os.path.realpath(__file__))
 
 #Starting platforms -- Let's add more variety
-PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40), (WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20),
+# [x, y, width, height/thickness]
+PLATFORMLIST = [(0, HEIGHT - 40, WIDTH, 40), (WIDTH / 2 - 20, HEIGHT * 3/4, 100, 20), #
 		(WIDTH/4 - 10, HEIGHT*2, 100, 20), (125, HEIGHT -250, 100, 20),
 		(150, 100, 75, 20),
 				]
@@ -132,6 +133,7 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		#change y position based on velocity
 		self.rect.y += self.vy
 		self.vy = 0 #stop afterwards
+		'''DEBUG: vx = 0 '''
 
 		#trying to the y-pos at collision height (save last y value)
 		self.rect.y = self.game.player.rect.y
@@ -193,7 +195,7 @@ class Game: #This is the jumper game
 
 	def load(self):
 		self.dir = path.dirname(__File__) #look for file in current folder
-		#could make a sound for each jumo
+		#could make a sound for each jump
 		self.leap = pg.mixer.Sound(path.join(self.dir, 'leap.ogg'))
 
 	def new(self):
@@ -233,8 +235,10 @@ class Game: #This is the jumper game
 		if hits:
 			#set y-position to where platform is
 			'''DEBUG: resets at center height once hits 1/4 from bottom '''
-			self.player.rect.y = HEIGHT - hits[0].rect.bottom -2
+			self.player.rect.y = hits[0].rect.bottom - 20
 			self.vy = 0 #stop motion
+
+			'''DEBUG: Stop at xy of platform '''
 
 		#Scroll further up once reach checkpoint (VERTICAL)
 		if self.player.rect.top <= HEIGHT/4: #when reach 3/4 of screen height
@@ -250,6 +254,7 @@ class Game: #This is the jumper game
 			self.playing = False #stop game
 			for sprite in self.all_sprites: #make it seem we're falling
 				sprite.rect.y -= max(self.player.vy, 10)
+				''' Check if this in in right direction (up) '''
 				if sprite.rect.bottom <0: #goes off screen, delete it
 					sprite.kill()
 		if len(self.platforms) == 0: #if we delete all platforms
@@ -281,7 +286,6 @@ class Game: #This is the jumper game
 					#self.load.leap.play() #make jumping noise
 			if event.type == pg.KEYUP: #if no hands on keyboard
 				self.player.stop() #stop the avatar from moving
-
 
 	def draw(self):
 		#things to put on screen
