@@ -1,10 +1,3 @@
-import pygame as pg
-import math
-import random
-import time
-import os
-from os import path
-
 ''' ESCAPEY GAME 6:40pm 10/31
 
 authors: ChristinaHolman, Kim Winter
@@ -19,9 +12,21 @@ Jump sound: 'justinarmstrong'
 
 '''
 
-#UPDATES
-'''The resetting y-pos is back arrgg. Also added music.
+import pygame as pg
+import math #why did I do this again?
+import random
+import time
+import os
+from os import path
 
+'''
+***** UPDATES *******
+For tomorrow 9am meeting at Olin!
+**The resetting y-pos is back (arrgg) but only once reaches 1/4 of bottom ??
+**Jump() does work but need to debug for jumping OFF a platforms
+**Need to look at stop() being called under events()
+**Need to look at calling the jump 'leap' sound
+&& Made more comments too.
 '''
 
 '''' GLOBAL CONSTANTS '''
@@ -141,17 +146,19 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 	def jump(self): #jump movement only when not in air
 		#check if we hit anything
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+		''' NEED TO SWITCH IF-ELSE. WANT TO JUMP ONLY IF ON SOLID '''
 		if hits: #dont move if we hit something
 			self.dy = 0
 		else: #if we arent, move
-			self.rect.y += 3
+			self.rect.y -= 5
 			#self.rect.y -= 3 #since have falling effect, dont need this?
 
-		''' NEED TO DEBUG '''
-		print '+++++++JUMP+++++++' #DEBUG: Not sure what's up?
-		print self.rect.y
+		''' FIXED _DEBUG: jump
+		print '+++++++JUMP+++++++'
+		print self.rect.y '''
 
 	def stop(self):
+		'''DEBUG: Not being called correctly in events()'''
 		#if we hit anything don't move
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
 		if hits == False: #actually not sure if we need the if statement
@@ -160,12 +167,10 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 
 	def calc_grav(self):
 		#The pseudo-gravitational effect
-
 		if self.vy == 0: #if not moving, big pull
 			self.vy = 1
 		else: #increase slightly after/incrementally
 			self.vy += .35
-
 
 class Platform(pg.sprite.Sprite): #creates our platforms/levers
 	def __init__(self, x, y, width, height):
@@ -225,16 +230,16 @@ class Game: #This is the jumper game
 		self.all_sprites.update() #update each sprite
 
 		# Check if we are on a platform
-		'''DEBUG. Stops when hits sides, not just top or bottom '''
+		'''oK IT IS STOPPING. BUT MAYBE TOO HIGH above platform? '''
 		hits = pg.sprite.spritecollide(self.player, self.platforms, False)
 		if hits:
-			#set y-position to player height + platform height
-			''' DEBUG: why keep starting at center height '''
-			self.player.rect.y = HEIGHT - hits[0].rect.top
+			#set y-position to where platform is
+			'''DEBUG: resets at center height once hits 1/4 from bottom '''
+			self.player.rect.y = HEIGHT - hits[0].rect.bottom -2
 			self.vy = 0 #stop motion
 
 		#Scroll further up once reach checkpoint (VERTICAL)
-		if self.player.rect.top <= HEIGHT /4: #when reach 3/4 of screen height
+		if self.player.rect.top <= HEIGHT/4: #when reach 3/4 of screen height
 			#Move at vel of player in opp direction
 			self.player.rect.y += abs(self.player.vy)
 			for form in self.platforms: #for each platform in set
@@ -251,6 +256,7 @@ class Game: #This is the jumper game
 					sprite.kill()
 		if len(self.platforms) == 0: #if we delete all platforms
 			self.playing = False #stop game and restart
+			print '+++++++++ RESTART ++++++++++'
 
 		#Make new platforms
 		while len(self.platforms) < 5: #num of platforms in set
@@ -273,7 +279,8 @@ class Game: #This is the jumper game
 			if event.type == pg.KEYDOWN: #if hits key
 				if event.key == pg.K_SPACE: #and it's spacebar
 					self.player.jump() #make avatar jump
-					self.leap.play() #make jumping noise
+					'''DEBUG: calling it properly'''
+					#self.load.leap.play() #make jumping noise
 			if event.type == pg.KEYUP: #if no hands on keyboard
 				self.player.stop() #stop the avatar from moving
 
