@@ -1,0 +1,11 @@
+ESCAPEY PET:
+@authors: Christina Holman, Kim Winter
+Fall 2016 Software Design -- Olin College 
+
+Help Skeevy the hamster escape his cage. Gain points as he moves to the top!
+
+FONT: Arial
+Background image: '  '
+Music: GotG Album "Pina Colada"
+
+Tags: pygame, platformer, scrolling, points, title, music
