@@ -19,12 +19,17 @@ from os import path
 
 '''
 ***** UPDATES *******
-For tomorrow 9am meeting at Olin!
-**The resetting y-pos is back (arrgg) but only once reaches 1/4 of bottom ??
 **Jump() does work but need to debug for jumping OFF a platforms
-**Need to look at stop() being called under events()
+**Jump higher!!!
+**Fix collide function (write our own maybe?)
 **Need to look at calling the jump 'leap' sound
-&& Made more comments too.
+'''
+
+''' Most recent code fixes--11/3/16:
+	Fixed stop function
+	Played around with the jump function a little (only jumps when on a platform)
+	Still need to figure out how to get him off the platform
+	When he hits a platform, now goes on top rather than kind of in the middle of it
 '''
 
 '''' GLOBAL CONSTANTS '''
@@ -146,12 +151,14 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 	def jump(self): #jump movement only when not in air
 		#check if we hit anything
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+		print hits
 		''' NEED TO SWITCH IF-ELSE. WANT TO JUMP ONLY IF ON SOLID '''
-		if hits: #dont move if we hit something
-			self.dy = 0
-		else: #if we arent, move
-			self.rect.y -= 5
-			#self.rect.y -= 3 #since have falling effect, dont need this?
+		if hits: #only jump when on platform
+			self.rect.y += 20
+			self.dy=30
+			print "IT WORKED"
+		else: #if we arent, don't move
+			self.dy=0
 
 		''' FIXED _DEBUG: jump
 		print '+++++++JUMP+++++++'
@@ -161,9 +168,8 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 		'''DEBUG: Not being called correctly in events()'''
 		#if we hit anything don't move
 		hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-		if hits == False: #actually not sure if we need the if statement
-			self.vx = 0
-			self.vy = 0
+		self.vx = 0
+		#self.vy = 0
 
 	def calc_grav(self):
 		#The pseudo-gravitational effect
@@ -231,11 +237,11 @@ class Game: #This is the jumper game
 
 		# Check if we are on a platform
 		'''oK IT IS STOPPING. BUT MAYBE TOO HIGH above platform? '''
-		hits = pg.sprite.spritecollide(self.player, self.platforms, False)
+		hits = pg.sprite.spritecollide(self.player, self.platforms, False) 
 		if hits:
 			#set y-position to where platform is
 			'''DEBUG: resets at center height once hits 1/4 from bottom '''
-			self.player.rect.y = hits[0].rect.bottom - 20
+			self.player.rect.y = hits[0].rect.bottom - 40
 			self.vy = 0 #stop motion
 
 			'''DEBUG: Stop at xy of platform '''
