@@ -19,8 +19,7 @@ from os import path
 
 '''
 ***** UPDATES *******
-**Jump() does work but need to debug for jumping OFF a platforms
-**Jump higher!!!
+**Fix jumps
 **Fix collide function (write our own maybe?)
 **Need to look at calling the jump 'leap' sound
 '''
