@@ -11,7 +11,7 @@ Jump sound: 'justinarmstrong' https://github.com/justinmeister/Mario-Level-1/tre
 '''
 
 import pygame as pg
-import math #why did I do this again?
+import math #why did I do this again? haha 
 import random
 import time
 import os
@@ -19,8 +19,7 @@ from os import path
 
 '''
 ***** UPDATES *******
-FIXED: ypos first setting; jump; stop; leap sound; scrolling
-WE HAVE A GAME!!
+Played around with some variables, and I've been able to play without getting stuck, but I also made it a slightly more reasonably difficult game
 '''
 
 '''' GLOBAL CONSTANTS '''
@@ -34,7 +33,7 @@ BLACK = (0, 0, 0)
 PURPLE = (255, 0, 255)
 GREEN = (0,255,0)
 YELLOW = (255,255,0)
-jumpvelocity = 100
+jumpvelocity = 45
 
 TITLE = "ESCAPEY JUMP" #(VERTICAL SCROLLING)
 self_dir = os.path.dirname(os.path.realpath(__file__))
@@ -168,9 +167,9 @@ class Player(pg.sprite.Sprite): #Creates the player/user
 	def calc_grav(self):
 		#The pseudo-gravitational effect
 		if self.vy == 0: #if not moving, big pull
-			self.vy = 1
+			self.vy = 3
 		else: #increase slightly after/incrementally
-			self.vy += .35
+			self.vy += 1
 
 class Platform(pg.sprite.Sprite): #creates our platforms/levers
 	def __init__(self, x, y, width, height):
@@ -255,7 +254,7 @@ class Game: #This is the jumper game
 			#make platform with random height, width, location
 			#keep thickness at 20 though
 			p = Platform(random.randrange(0,WIDTH-width_p),
-				random.randrange(-75,-30), width_p, 20)
+				random.randrange(-50,-20), width_p, 20)
 			self.platforms.add(p) #add new platforms to set
 			self.all_sprites.add(p) #and to all sprites
 			print 'NEW PLATFORMS'
